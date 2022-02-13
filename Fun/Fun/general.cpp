@@ -98,8 +98,20 @@ INT WINAPI ctrl_handler(DWORD event)
 void console_init()
 {
 	DWORD checkerValue;
-	VirtualProtect((PVOID)&FreeConsole, 1, PAGE_EXECUTE_READWRITE, &checkerValue);
-	*(BYTE*)(&FreeConsole) = (0xC3);
+
+	// The Windows functions here are `jmp ds:[0x????????]`
+	// `jmp ds:[????????]` is encoded as `FF 25 ?? ?? ?? ??`
+	// ROBLOX checks the first 2 bytes `FF 25` because they
+	// are guaranteed; the pointer value is not. If the
+	// pointer is replaced to an inert function such like
+	// IsSystemResumeAutomatic, IsWow64Message, InSendMessage,
+	// etc. then this basic detection is subverted.
+
+	PBYTE replacementPtr = (PBYTE)&IsSystemResumeAutomatic;
+	PBYTE destinationPtr = (PBYTE)&FreeConsole;
+	VirtualProtect((PVOID)destinationPtr, 4, PAGE_EXECUTE_READWRITE, &checkerValue);
+	*(DWORD*)(destinationPtr + 2) = *(DWORD*)(replacementPtr + 2);
+	VirtualProtect((PVOID)destinationPtr, 4, checkerValue, &checkerValue);
 
 	if (GetConsoleWindow() == NULL)
 	{
@@ -316,8 +328,6 @@ int toybox_main()
 
 	while (true)
 	{
-		Sleep(0);
-
 		std::string command_buf;
 		std::getline(std::cin, command_buf);
 
