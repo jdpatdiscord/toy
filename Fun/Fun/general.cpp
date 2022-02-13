@@ -82,30 +82,14 @@ void setup_hooks();
 
 INT WINAPI ctrl_handler(DWORD event)
 {
-	printf("handler\n");
 	switch (event)
 	{
 	case CTRL_CLOSE_EVENT:
+		// for some reason, this is handled but the parent window closes too (why)
 		ShowWindow(::GetConsoleWindow(), SW_HIDE);
 		return 1;
 	case CTRL_C_EVENT:
-		printf("helloe\n");
-		CONSOLE_SELECTION_INFO selection;
-		GetConsoleSelectionInfo(&selection);
-		if (selection.dwFlags & CONSOLE_SELECTION_NOT_EMPTY)
-		{
-			CONSOLE_SCREEN_BUFFER_INFO buffer;
-			GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buffer);
-			DWORD dwElemCount = (selection.dwSelectionAnchor.X * selection.dwSelectionAnchor.Y);
-			PCHAR_INFO pch = (PCHAR_INFO)malloc(dwElemCount * sizeof(CHAR_INFO));
-			if (pch != NULL)
-			{
-				ReadConsoleOutputW(GetStdHandle(STD_OUTPUT_HANDLE), pch, selection.dwSelectionAnchor, { selection.srSelection.Top, selection.srSelection.Left }, &selection.srSelection);
-				PWCHAR selectedText = unicodeCharinfoToWideString(pch, dwElemCount);
-				copyUnicodeToClipboard(selectedText, dwElemCount);
-				free(selectedText);
-			}
-		}
+		// give up because windows doesn't actually fire CTRL_C_EVENT if you have text selected when you Ctrl+C (?)
 		return 1;
 	}
 	return 0;
@@ -160,7 +144,7 @@ void display_instance(std::uintptr_t instance)
 	if (instance != NULL)
 	{
 		printf(
-			"instance address: 0x%08X"
+			     "instance address: 0x%08X"
 			"\n" "==============================="
 			"\n" "instance.Name = \"%s\""
 			"\n" "instance.ClassName = \"%s\""
@@ -241,7 +225,7 @@ void setup_hooks()
 			{
 				job* job_obj = *(job**)job_ptr;
 				printf("name string: %s\n", job_obj->name.c_str());
-				if (auto& job_name = job_obj->name; job_name == "WaitingScriptJob")
+				if (auto& job_name = job_obj->name; job_name == "WaitingHybridScriptsJob")
 				{
 					printf("found %s\n", job_name.c_str());
 					waiting_script_job = job_obj;

@@ -28,6 +28,7 @@ extern FILE* stream;
 const auto _this_module_base = GetModuleHandle(NULL);
 
 #define _Rebase(N) (N - 0x400000 + (std::uintptr_t)_this_module_base)
+#define _Unbase(N) (N - (std::uintptr_t)_this_module_base + 0x400000)
 
 int number_of_children(std::uintptr_t instance);
 void display_instance(std::uintptr_t instance);

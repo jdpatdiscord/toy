@@ -18,7 +18,7 @@ char* instance_classname(std::uintptr_t instance)
 	return (char*)string_class;
 }
 
-std::string instance_name(std::uintptr_t instance)
+std::string& instance_name(std::uintptr_t instance)
 {
 	 return **(std::string**)(instance + o_name);
 }
@@ -53,8 +53,8 @@ std::uintptr_t find_first_child_of_class(std::uintptr_t instance, const char* cl
 		for (; p_children_ptr != p_children_end; p_children_ptr += 8)
 		{
 			auto instance = *(std::uintptr_t*)p_children_ptr;
-			auto class_name = instance_classname(instance);
-			if (!strcmp(class_name, class_name))
+			auto instance_class_name = instance_classname(instance);
+			if (!strcmp(instance_class_name, class_name))
 			{
 				return instance;
 			}

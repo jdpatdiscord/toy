@@ -7,6 +7,16 @@ std::vector<std::pair<std::string, std::vector<std::string>>> command_buffer;
 
 std::uintptr_t cached_instance;
 
+void cmd_help(int, std::vector<std::string>& arg_list)
+{
+	for (auto& command : command_list)
+	{
+		auto& [name, info] = command;
+		auto& [func, desc] = info;
+		printf("%s: %s\n", name.c_str(), desc.c_str());
+	}
+}
+
 void cmd_get_instance_of_classname(int, std::vector<std::string>& arg_list)
 {
 	if (arg_list.size() != 0)
@@ -31,10 +41,103 @@ void cmd_get_instance_of_name(int, std::vector<std::string>& arg_list)
 	}
 }
 
+void cmd_set_walkspeed(int, std::vector<std::string>& arg_list)
+{
+	if (arg_list.size() != 0)
+	{
+		if (data_model != NULL)
+		{
+			std::uintptr_t players = find_first_child_of_class(data_model, "Players");
+			if (players != NULL)
+			{
+				std::uintptr_t localplayer = *(std::uintptr_t*)(players + o_localplayer);
+				if (localplayer != NULL)
+				{
+					std::uintptr_t character = *(std::uintptr_t*)(localplayer + o_character);
+					if (character != NULL)
+					{
+						std::uintptr_t humanoid = find_first_child_of_class(character, "Humanoid");
+						if (humanoid != NULL)
+						{
+							float new_speed = std::stof(arg_list[0]);
+							((int(__thiscall*)(std::uintptr_t, float))walkspeed_setter)(humanoid, new_speed);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void cmd_get_localplayer(int, std::vector<std::string>& arg_list)
+{
+	if (data_model != NULL)
+	{
+		std::uintptr_t players = find_first_child_of_class(data_model, "Players");
+		std::uintptr_t localplayer = *(std::uintptr_t*)(players + o_localplayer);
+		display_instance(localplayer);
+	}
+}
+
+void cmd_get_properties_of_classname(int, std::vector<std::string>& arg_list)
+{
+	if (arg_list.size() != 0)
+	{
+		if (data_model != NULL)
+		{
+			std::uintptr_t instance = find_first_descendant_of_class(data_model, arg_list[0].c_str(), NULL);
+			if (instance != NULL)
+			{
+				std::uintptr_t unk_1 = *(std::uintptr_t*)(instance + 12);
+				std::uintptr_t prop_begin = *(std::uintptr_t*)(unk_1 + 536);
+				std::uintptr_t prop_end = *(std::uintptr_t*)(unk_1 + 540);
+				for (std::uintptr_t i = prop_begin; i < prop_end; i += 12)
+				{
+					unsigned val = *(unsigned*)(i + 4);
+					if (val != NULL)
+					{
+						unsigned prop_id = *(unsigned*)(i + 4 + 4);
+						bool is_thread_safe = false;
+						switch (prop_id)
+						{
+							case 0:
+							{
+								std::uintptr_t unk_2 = *(std::uintptr_t*)(i + 4);
+								if (unk_2 != NULL)
+								{
+									is_thread_safe = *(unsigned*)(unk_2 + 16) != 1;
+								}
+								break;
+							}
+							// The other cases involve Lua.
+						}
+						std::string& prop_name = **(std::string**)(*(std::uintptr_t*)(i + 4) + 4);
+						printf("Property Name, ID: %s, %s\n", property_id_name[prop_id], prop_name.c_str());
+					}
+				}
+			}
+		}
+	}
+}
+
+void cmd_lookup_name(int, std::vector<std::string>& arg_list)
+{
+	if (arg_list.size() != 0)
+	{
+		std::uintptr_t ret = ((int(__thiscall*)(const char*))lookup_f)(arg_list[0].c_str());
+		printf("name lookup: 0x%08X\n", ret);
+	}
+}
+
 void commands_init()
 {
+	command_list.emplace("help", command_info(cmd_help, "Lists all commands and their descriptions"));
 	command_list.emplace("find_instance_of_name", command_info(cmd_get_instance_of_name, "Looks for an instance of Name passed in 1st argument, then prints the address. Takes one argument."));
 	command_list.emplace("find_instance_of_classname", command_info(cmd_get_instance_of_classname, "Looks for an instance of ClassName passed in 1st argument, then prints the address. Takes one argument."));
+	command_list.emplace("set_walkspeed", command_info(cmd_set_walkspeed, "Sets LocalPlayer WalkSpeed"));
+	command_list.emplace("get_localplayer", command_info(cmd_get_localplayer, "Displays LocalPlayer instance"));
+	command_list.emplace("get_properties_of_classname", command_info(cmd_get_properties_of_classname, "Displays properties of a ClassName. The passed ClassName must exist within the game"));
+	command_list.emplace("lookup_name", command_info(cmd_lookup_name, "Looks up ClassName"));
 
 	return;
 };
