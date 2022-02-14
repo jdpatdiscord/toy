@@ -28,3 +28,5 @@ void cmd_set_walkspeed(int, std::vector<std::string>& arg_list);
 void cmd_get_localplayer(int, std::vector<std::string>& arg_list);
 void cmd_get_properties_of_classname(int, std::vector<std::string>& arg_list);
 void cmd_lookup_name(int, std::vector<std::string>& arg_list);
+void cmd_get_descriptor_list(int, std::vector<std::string>& arg_list);
+void cmd_new_instance(int, std::vector<std::string>& arg_list);

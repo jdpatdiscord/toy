@@ -124,8 +124,26 @@ void cmd_lookup_name(int, std::vector<std::string>& arg_list)
 {
 	if (arg_list.size() != 0)
 	{
-		std::uintptr_t ret = ((int(__thiscall*)(const char*))lookup_f)(arg_list[0].c_str());
-		printf("name lookup: 0x%08X\n", ret);
+		printf("Descriptor: 0x%08X\n", RBX::Name::Lookup(arg_list[0].c_str(), NULL));
+	}
+}
+
+void cmd_get_descriptor_list(int, std::vector<std::string>& arg_list)
+{
+	if (arg_list.size() != 0)
+	{
+		RBX::Name::Lookup("ThisNameDoesNotExist", arg_list[0].c_str()); // force entire map traversal, and output to file
+	}
+
+	return;
+}
+
+void cmd_new_instance(int, std::vector<std::string>& arg_list)
+{
+	if (arg_list.size() != 0)
+	{
+		std::uintptr_t instance = new_instance(arg_list[0].c_str(), find_first_child_of_class(data_model, "Workspace"));
+
 	}
 }
 
@@ -138,6 +156,7 @@ void commands_init()
 	command_list.emplace("get_localplayer", command_info(cmd_get_localplayer, "Displays LocalPlayer instance"));
 	command_list.emplace("get_properties_of_classname", command_info(cmd_get_properties_of_classname, "Displays properties of a ClassName. The passed ClassName must exist within the game"));
 	command_list.emplace("lookup_name", command_info(cmd_lookup_name, "Looks up ClassName"));
-
+	command_list.emplace("get_descriptor_list", command_info(cmd_get_descriptor_list, "Gets list of class descriptors, and outputs to passed filename."));
+	command_list.emplace("new_instance", command_info(cmd_new_instance, "Creates a new instance where 1st arg = ClassName"));
 	return;
 };
