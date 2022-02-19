@@ -60,7 +60,7 @@ void cmd_set_walkspeed(int, std::vector<std::string>& arg_list)
 						if (humanoid != NULL)
 						{
 							float new_speed = std::stof(arg_list[0]);
-							((int(__thiscall*)(std::uintptr_t, float))walkspeed_setter)(humanoid, new_speed);
+							//((int(__thiscall*)(std::uintptr_t, float))walkspeed_setter)(humanoid, new_speed);
 						}
 					}
 				}
@@ -138,12 +138,25 @@ void cmd_get_descriptor_list(int, std::vector<std::string>& arg_list)
 	return;
 }
 
-void cmd_new_instance(int, std::vector<std::string>& arg_list)
+void cmd_run_bytecode(int, std::vector<std::string>& arg_list)
 {
 	if (arg_list.size() != 0)
 	{
-		std::uintptr_t instance = new_instance(arg_list[0].c_str(), find_first_child_of_class(data_model, "Workspace"));
+		std::ifstream F(arg_list[0], std::ios::binary);
+		size_t Fs = std::filesystem::file_size(arg_list[0]);
+		char* Fb = (char*)malloc(Fs);
+		F.read(Fb, Fs);
+		F.close();
 
+		if (rbx_localscript_globalthread != NULL && data_model != NULL)
+		{
+			ret_call<int, std::uintptr_t, char*, char*, int, std::uintptr_t>(
+				cc_cdecl, luau_load, 
+				rbx_localscript_globalthread, (char*)"@LOL", Fb, Fs, 0);
+			ret_call<int, int>(
+				cc_cdecl, rbx_spawn,
+				rbx_localscript_globalthread);
+		}
 	}
 }
 
@@ -152,11 +165,12 @@ void commands_init()
 	command_list.emplace("help", command_info(cmd_help, "Lists all commands and their descriptions"));
 	command_list.emplace("find_instance_of_name", command_info(cmd_get_instance_of_name, "Looks for an instance of Name passed in 1st argument, then prints the address. Takes one argument."));
 	command_list.emplace("find_instance_of_classname", command_info(cmd_get_instance_of_classname, "Looks for an instance of ClassName passed in 1st argument, then prints the address. Takes one argument."));
-	command_list.emplace("set_walkspeed", command_info(cmd_set_walkspeed, "Sets LocalPlayer WalkSpeed"));
+	//command_list.emplace("set_walkspeed", command_info(cmd_set_walkspeed, "Sets LocalPlayer WalkSpeed"));
 	command_list.emplace("get_localplayer", command_info(cmd_get_localplayer, "Displays LocalPlayer instance"));
 	command_list.emplace("get_properties_of_classname", command_info(cmd_get_properties_of_classname, "Displays properties of a ClassName. The passed ClassName must exist within the game"));
 	command_list.emplace("lookup_name", command_info(cmd_lookup_name, "Looks up ClassName"));
 	command_list.emplace("get_descriptor_list", command_info(cmd_get_descriptor_list, "Gets list of class descriptors, and outputs to passed filename."));
-	command_list.emplace("new_instance", command_info(cmd_new_instance, "Creates a new instance where 1st arg = ClassName"));
+	command_list.emplace("run_bytecode_file", command_info(cmd_run_bytecode, "Runs bytecode from a file."));
+
 	return;
 };

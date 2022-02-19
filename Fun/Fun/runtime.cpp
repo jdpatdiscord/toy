@@ -1,10 +1,22 @@
 #include "runtime.hpp"
 
-std::uintptr_t main_script_context;
-std::uintptr_t data_model;
+std::uintptr_t rbx_localscript_globalthread = NULL;
+std::uintptr_t main_script_context = NULL;
+std::uintptr_t data_model = NULL;
 
-std::uintptr_t waiting_script_job_destroy;
-std::uintptr_t* new_vft;
+std::uintptr_t waiting_script_job_destroy = NULL;
+std::uintptr_t* new_vft = NULL;
+
+#pragma optimize("", off)
+__declspec(naked) void __stdcall stdcall_empty_function()
+{
+	__asm ret;
+}
+__declspec(naked) void __fastcall fastcall_empty_function()
+{
+	__asm ret;
+}
+#pragma optimize("", on)
 
 char* instance_classname(std::uintptr_t instance)
 {
@@ -102,25 +114,6 @@ std::uintptr_t find_first_descendant_of_class(std::uintptr_t instance, const cha
 	return o;
 }
 
-std::uintptr_t new_instance(const char* classname, std::uintptr_t parent)
-{
-	std::uintptr_t instance;
-	std::uintptr_t descriptor = RBX::Name::Lookup(classname, NULL);
-	if (descriptor == NULL)
-	{
-		printf("Invalid descriptor\n");
-		return NULL;
-	}
-
-	((int(__fastcall*)(std::uintptr_t, std::uintptr_t*, int))create_by_name)(descriptor, &instance, 2);
-	if (parent != NULL && instance != NULL)
-	{
-		//*(std::uintptr_t*)(instance + o_parent) = parent;
-		((char(__thiscall*)(std::uintptr_t, std::uintptr_t))setparentinternal)(instance, parent);
-	}
-	return instance;
-}
-
 std::uint32_t RBX::Name::_impl_namehash(char* begin, char* end)
 {
 	unsigned int result;
@@ -132,10 +125,8 @@ std::uint32_t RBX::Name::_impl_namehash(char* begin, char* end)
 	return result;
 }
 
-std::uintptr_t RBX::Name::_impl_find(std::uintptr_t map_0, const char** pkey, void* special_arg)
+std::uintptr_t RBX::Name::_impl_find(std::uintptr_t map_0, const char** pkey)
 {
-	std::vector<std::string> descriptor_list;
-
 	std::uintptr_t map1_4 = *(std::uintptr_t*)(map_0 + 4);
 	std::uintptr_t map1_0 = *(std::uintptr_t*)(map_0 + 0);
 	std::uintptr_t map2_0 = *(std::uintptr_t*)(map_0 + 0);
@@ -159,28 +150,13 @@ std::uintptr_t RBX::Name::_impl_find(std::uintptr_t map_0, const char** pkey, vo
 		sresult = strcmp(*(const char**)(ppDescriptor + 0), (char*)key_1);
 		if (sresult == 0)
 		{
-			if (special_arg != NULL)
-				descriptor_list.push_back(*(const char**)(ppDescriptor + 0));
 			return (std::uintptr_t)ppDescriptor + 4;
 		}
 		//sresult = strcmp(*(const char**)(ppDescriptor + 0), (char*)map0_16);
 		//if (sresult)
 		{
-			if (special_arg != NULL)
-				if (std::string descriptor_string = *(const char**)(ppDescriptor + 0); descriptor_string != "")
-					descriptor_list.push_back(descriptor_string);
-
 			hash_total = hash_mask & (keya + hash_total + 1);
 			if (++keya <= hash_mask) continue;
-		}
-		if (special_arg != NULL)
-		{
-			std::ofstream F((char*)special_arg, std::ios::trunc | std::ios::binary);
-			std::string outstring = "";
-			for (const std::string& desc_str : descriptor_list)
-				outstring += desc_str + '\n';
-			F.write(outstring.c_str(), outstring.size());
-			F.close();
 		}
 		return NULL;
 	}
@@ -193,7 +169,7 @@ std::uintptr_t RBX::Name::Lookup(const char* classname, const char* output_file)
 	int mutex_status = ((int(__cdecl*)(std::uintptr_t))namefactory_lock)(namefactory);
 	if (mutex_status != 0) return 0;
 
-	std::uintptr_t result = _impl_find(namefactory + o_namefactory_namemap, &classname, (void*)output_file);
+	std::uintptr_t result = _impl_find(namefactory + o_namefactory_namemap, &classname);
 	if (result)
 		result = *(std::uintptr_t*)result;
 	else
@@ -203,3 +179,38 @@ std::uintptr_t RBX::Name::Lookup(const char* classname, const char* output_file)
 
 	return result;
 }
+
+std::uintptr_t RL::decrypt_pointer(std::uintptr_t address, int type)
+{
+	switch (type)
+	{
+		case ptr_addptr:
+			return *(std::uintptr_t*)address - address;
+		case ptr_subptr:
+			return address - *(std::uintptr_t*)address;
+		case ptr_suboff:
+			return *(std::uintptr_t*)address + address;
+		case ptr_xorptr:
+			return *(std::uintptr_t*)address ^ address;
+	}
+	return 0;
+};
+
+void RL::encrypt_pointer(std::uintptr_t address, std::uintptr_t value, int type)
+{
+	switch (type)
+	{
+		case ptr_addptr:
+			*(DWORD*)address = address + value;
+			break;
+		case ptr_subptr:
+			*(DWORD*)address = address - value;
+			break;
+		case ptr_suboff:
+			*(DWORD*)address = value - address;
+			break;
+		case ptr_xorptr:
+			*(DWORD*)address = address ^ value;
+			break;
+	}
+};

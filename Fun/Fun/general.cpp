@@ -310,6 +310,14 @@ void setup_hooks()
 
 							printf("signal set, ready for commands.\n");
 						}
+						if (!strcmp(classname, "ScriptContext"))
+						{
+							printf("found %s\n", classname);
+
+							rbx_localscript_globalthread = RL::decrypt_pointer(instance + o_scriptcontext_localscriptstate, e_scriptcontext_enc);
+
+							printf("LocalScript state: 0x%08X\n", rbx_localscript_globalthread);
+						}
 					}
 				}
 			}

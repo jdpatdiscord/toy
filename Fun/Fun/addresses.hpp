@@ -2,27 +2,37 @@
 
 #include "general.hpp"
 
-/* modified addresses */
-const std::uintptr_t add_signal_function = _Rebase(0x1C59A90); // "AppStarted"/"GuiCluster"
-const std::uintptr_t main_jobs_singleton = _Rebase(0x36C15E4); // "averageStepTime"
+constexpr unsigned ptr_addptr = 0;
+constexpr unsigned ptr_subptr = 1;
+constexpr unsigned ptr_suboff = 2;
+constexpr unsigned ptr_xorptr = 3;
 
-const std::uintptr_t walkspeed_setter = _Rebase(0xBE7EA0); // int(instance*, char, float)
-const std::uintptr_t walkspeed_getter = _Rebase(0xBE3820); // double(instance*)
-const std::uintptr_t gravity_setter = _Rebase(0x94DB50); // int(instance*, char, float)
-const std::uintptr_t gravity_getter = _Rebase(0x94DB40); // double(instance*)
+constexpr unsigned cc_stdcall = 0;
+constexpr unsigned cc_cdecl = 1;
+constexpr unsigned cc_fastcall = 2;
+
+/* modified addresses */
+const std::uintptr_t add_signal_function = _Rebase(0x1C9F540); // "AppStarted"/"GuiCluster"
+const std::uintptr_t main_jobs_singleton = _Rebase(0x3739F9C); // "averageStepTime"
+
+const std::uintptr_t call_ebx_occurrence = _Rebase(0x5E9CEF); // FF D3 in IDA
+
+const std::uintptr_t luau_load = _Rebase(0x1A32710); // (lua_State* L, const char* chunkname, const char* data, size_t size, int env), "Parallel" xref
+const std::uintptr_t rbx_spawn = _Rebase(0x7CA5E0); // __cdecl (lua_State*), "Spawn function requires 1 argument"
 
 // "Unable to create an Instance of type"
 
-const std::uintptr_t namefactory_singleton = _Rebase(0x364136C);
+const std::uintptr_t namefactory_singleton = _Rebase(0x36B91A4);
 
-const std::uintptr_t namefactory_lock = _Rebase(0x20F9725);
-const std::uintptr_t namefactory_unlock = _Rebase(0x20F9780);
-
-const std::uintptr_t create_by_name = _Rebase(0x639620); // int(void*, void*, int)
-
-const std::uintptr_t setparentinternal = _Rebase(0x631440);
+const std::uintptr_t namefactory_lock = _Rebase(0x213FFF5);
+const std::uintptr_t namefactory_unlock = _Rebase(0x2140050);
 
 /* modified offsets */
+const std::ptrdiff_t o_scriptcontext_localscriptstate = 508;
+const std::ptrdiff_t o_scriptcontext_corescriptstate = 308;
+
+constexpr unsigned e_scriptcontext_enc = ptr_suboff;
+
 const std::ptrdiff_t o_waitingscriptjob_scriptcontext = 304;
 
 const std::ptrdiff_t o_jobs_begin = 300;
@@ -51,6 +61,8 @@ const std::ptrdiff_t o_runservice_stepped = 256; // "RunService.Stepped"
 // ...
 
 /* runtime */
+extern std::uintptr_t rbx_localscript_globalthread;
+
 extern std::uintptr_t  main_script_context;
 extern std::uintptr_t  data_model;
 
