@@ -214,3 +214,49 @@ void RL::encrypt_pointer(std::uintptr_t address, std::uintptr_t value, int type)
 			break;
 	}
 };
+
+std::uintptr_t RL::gettop(std::uintptr_t thread)
+{
+	return ( *(std::uintptr_t*)(thread + o_ls_top) - *(std::uintptr_t*)(thread + o_ls_base) ) >> 4;
+}
+
+void RL::setthreadidentity(std::uintptr_t thread, std::uint64_t identity)
+{
+	*(std::uint64_t*)(*(std::uintptr_t*)(thread + o_ls_extraspace) + o_es_identity) = identity;
+}
+
+std::uintptr_t RL::index2adr(std::uintptr_t thread, int index)
+{
+	if (index <= 0)
+	{
+		//retcall
+	} 
+	else
+	{
+		std::uintptr_t object = *(std::uintptr_t*)(thread + o_ls_base) + (c_tvaluesize * (index - 1));
+		if (object < *(std::uintptr_t*)(thread + o_ls_top))
+		{
+			return object;
+		}
+		else
+		{
+			return 0; // CHANGE TO NILOBJ
+		}
+	}
+}
+
+std::string compile_script_cstr(char* script, size_t size)
+{
+	struct ClientBytecodeEncoder : Luau::BytecodeEncoder
+	{
+		uint8_t encodeOp(const std::uint8_t op) override
+		{
+			return op * 227;
+		}
+	};
+
+	ClientBytecodeEncoder encoder;
+	std::string bytecode = Luau::compile(std::string(script, size), {}, {}, &encoder);
+
+	return bytecode;
+}

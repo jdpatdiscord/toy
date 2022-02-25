@@ -28,18 +28,30 @@ const std::uintptr_t namefactory_lock = _Rebase(0x213FFF5);
 const std::uintptr_t namefactory_unlock = _Rebase(0x2140050);
 
 /* modified offsets */
-const std::ptrdiff_t o_scriptcontext_localscriptstate = 508;
-const std::ptrdiff_t o_scriptcontext_corescriptstate = 308;
 
-constexpr unsigned e_scriptcontext_enc = ptr_suboff;
+const std::ptrdiff_t o_namefactory_nullname = 72;
+const std::ptrdiff_t o_namefactory_namemap = 48;
 
 const std::ptrdiff_t o_waitingscriptjob_scriptcontext = 304;
 
 const std::ptrdiff_t o_jobs_begin = 300;
 const std::ptrdiff_t o_jobs_end = 304;
 
-const std::ptrdiff_t o_namefactory_nullname = 72;
-const std::ptrdiff_t o_namefactory_namemap = 48;
+const std::ptrdiff_t o_scriptcontext_localscriptstate = 308;
+const std::ptrdiff_t o_scriptcontext_corescriptstate = 508;
+
+constexpr unsigned e_scriptcontext_enc = ptr_suboff;
+
+const std::ptrdiff_t o_ls_top = 20;
+const std::ptrdiff_t o_ls_base = 24;
+
+const std::ptrdiff_t o_ls_extraspace = 112;
+
+const std::ptrdiff_t o_es_identity = 24;
+
+/* more or less constant values */
+constexpr std::ptrdiff_t o_tt = 12;
+constexpr std::ptrdiff_t c_tvaluesize = 16;
 
 /* base instance */
 const std::ptrdiff_t o_children = 44;

@@ -1,3 +1,6 @@
 [submodule "Fun/Fun/ExceptionHandler"]
 	path = Fun/Fun/ExceptionHandler
 	url = https://github.com/jdpatdiscord/ExceptionHandler
+[submodule "Fun/Fun/luau"]
+	path = Fun/Fun/luau
+	url = https://github.com/Roblox/luau

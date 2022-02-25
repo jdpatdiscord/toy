@@ -23,7 +23,13 @@
 #include <unordered_map>
 #include <map>
 
+#include <Luau/Compiler.h>
+#include <Luau/Bytecode.h>
+#include <Luau/BytecodeBuilder.h>
+
 extern FILE* stream;
+
+extern HMODULE this_dll;
 
 const auto _this_module_base = GetModuleHandle(NULL);
 

@@ -138,7 +138,7 @@ void cmd_get_descriptor_list(int, std::vector<std::string>& arg_list)
 	return;
 }
 
-void cmd_run_bytecode(int, std::vector<std::string>& arg_list)
+void cmd_run_bytecode_file(int, std::vector<std::string>& arg_list)
 {
 	if (arg_list.size() != 0)
 	{
@@ -150,14 +150,37 @@ void cmd_run_bytecode(int, std::vector<std::string>& arg_list)
 
 		if (rbx_localscript_globalthread != NULL && data_model != NULL)
 		{
-			ret_call<int, std::uintptr_t, char*, char*, int, std::uintptr_t>(
-				cc_cdecl, luau_load, 
-				rbx_localscript_globalthread, (char*)"@LOL", Fb, Fs, 0);
-			ret_call<int, int>(
-				cc_cdecl, rbx_spawn,
-				rbx_localscript_globalthread);
+			ret_call<int, std::uintptr_t, char*, char*, int, std::uintptr_t>(cc_fastcall, luau_load, rbx_localscript_globalthread, (char*)"@LOL", Fb, Fs, 0);
+			RL::setthreadidentity(rbx_localscript_globalthread, 8ull);
+			ret_call<int, int>(cc_cdecl, rbx_spawn, rbx_localscript_globalthread);
 		}
 	}
+}
+
+void cmd_run_script_file(int, std::vector<std::string>& arg_list)
+{
+	if (arg_list.size() != 0)
+	{
+		std::ifstream F(arg_list[0], std::ios::binary);
+		size_t Fs = std::filesystem::file_size(arg_list[0]);
+		char* Fb = (char*)malloc(Fs);
+		F.read(Fb, Fs);
+		F.close();
+
+		std::string bytecode = compile_script_cstr(Fb, Fs);
+
+		if (rbx_localscript_globalthread != NULL && data_model != NULL)
+		{
+			ret_call<int, std::uintptr_t, char*, char*, int, std::uintptr_t>(cc_fastcall, luau_load, rbx_localscript_globalthread, (char*)"@LOL", (char*)bytecode.c_str(), bytecode.size(), 0);
+			RL::setthreadidentity(rbx_localscript_globalthread, 8ull);
+			ret_call<int, int>(cc_cdecl, rbx_spawn, rbx_localscript_globalthread);
+		}
+	}
+}
+
+void cmd_autolaunch_experiment(int, std::vector<std::string>& arg_list)
+{
+
 }
 
 void commands_init()
@@ -165,12 +188,13 @@ void commands_init()
 	command_list.emplace("help", command_info(cmd_help, "Lists all commands and their descriptions"));
 	command_list.emplace("find_instance_of_name", command_info(cmd_get_instance_of_name, "Looks for an instance of Name passed in 1st argument, then prints the address. Takes one argument."));
 	command_list.emplace("find_instance_of_classname", command_info(cmd_get_instance_of_classname, "Looks for an instance of ClassName passed in 1st argument, then prints the address. Takes one argument."));
-	//command_list.emplace("set_walkspeed", command_info(cmd_set_walkspeed, "Sets LocalPlayer WalkSpeed"));
 	command_list.emplace("get_localplayer", command_info(cmd_get_localplayer, "Displays LocalPlayer instance"));
 	command_list.emplace("get_properties_of_classname", command_info(cmd_get_properties_of_classname, "Displays properties of a ClassName. The passed ClassName must exist within the game"));
 	command_list.emplace("lookup_name", command_info(cmd_lookup_name, "Looks up ClassName"));
 	command_list.emplace("get_descriptor_list", command_info(cmd_get_descriptor_list, "Gets list of class descriptors, and outputs to passed filename."));
-	command_list.emplace("run_bytecode_file", command_info(cmd_run_bytecode, "Runs bytecode from a file."));
+	command_list.emplace("run_bytecode_file", command_info(cmd_run_bytecode_file, "Runs bytecode from a file."));
+	command_list.emplace("run_script_file", command_info(cmd_run_script_file, "Runs a script from a file."));
+	command_list.emplace("autolaunch_experiment", command_info(cmd_autolaunch_experiment, "Auto-launch stuff"));
 
 	return;
 };

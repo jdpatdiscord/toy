@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fun", "Fun\Fun.vcxproj", "{F43197B5-4BD3-4E0E-9748-B95689CACBCE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ToyDLL", "Fun\Fun.vcxproj", "{F43197B5-4BD3-4E0E-9748-B95689CACBCE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoLauncher", "AutoLauncher\AutoLauncher.vcxproj", "{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{F43197B5-4BD3-4E0E-9748-B95689CACBCE}.Release|x64.Build.0 = Release|x64
 		{F43197B5-4BD3-4E0E-9748-B95689CACBCE}.Release|x86.ActiveCfg = Release|Win32
 		{F43197B5-4BD3-4E0E-9748-B95689CACBCE}.Release|x86.Build.0 = Release|Win32
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Debug|x64.ActiveCfg = Debug|x64
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Debug|x64.Build.0 = Debug|x64
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Debug|x86.ActiveCfg = Debug|Win32
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Debug|x86.Build.0 = Debug|Win32
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Release|x64.ActiveCfg = Release|x64
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Release|x64.Build.0 = Release|x64
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Release|x86.ActiveCfg = Release|Win32
+		{41F2C1A0-1A39-4481-BC32-D9B7C006ECDE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

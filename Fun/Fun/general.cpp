@@ -3,6 +3,7 @@
 #include "commands.hpp"
 #include "runtime.hpp"
 
+HMODULE this_dll = NULL;
 FILE* stream;
 
 ExceptionManager::EHSettings settings = {
@@ -327,12 +328,66 @@ void setup_hooks()
 	return;
 }
 
+const char* chosen_dll = "Shell32.dll";
+std::uintptr_t getprocaddress_address = NULL;
+std::uintptr_t original_data_ptr = NULL; /* .data offset from `jmp ds:[loc]` */
+std::uintptr_t replaced_data_ptr = NULL; /* somewhere in .data that we want to place the hook */
+
+FARPROC WINAPI getprocaddress_hook(HMODULE hModule, LPCSTR lpProcName)
+{
+	if (hModule == this_dll)
+	{
+		*(std::uint32_t*)(getprocaddress_address + 0x2) = original_data_ptr;
+		FARPROC result = GetProcAddress(hModule, lpProcName);
+		*(std::uint32_t*)(getprocaddress_address + 0x2) = replaced_data_ptr; /* this function */
+
+		return result;
+	}
+}
+
+const char* asm_printf_str = "%02X ";
+
+__declspec(naked) void ds_output()
+{
+	__asm
+	{
+		mov ebx, &original_data_ptr; // begin
+		mov edi, &original_data_ptr; // end
+		add edi, 0x20;
+	bloop:
+		mov edx, ds : [ebx] ;
+		push edx;
+		push asm_printf_str;
+		call printf;
+		cmp ebx, edi;
+		inc ebx;
+		jb bloop;
+		xor eax, eax;
+		xor ebx, ebx;
+		xor edi, edi;
+		ret;
+	}
+}
+
+void getprocaddress_hook_setup()
+{
+	getprocaddress_address = (std::uintptr_t)&GetProcAddress;
+	original_data_ptr = *(std::uint32_t*)(getprocaddress_address + 0x2);
+	ds_output();
+
+	Sleep(UINT_MAX);
+
+	return;
+}
+
 int toybox_main()
 {
 	ExceptionManager::Init(&settings);
 	console_init();
 	setup_hooks();
 	commands_init();
+
+	getprocaddress_hook_setup();
 
 	while (true)
 	{
@@ -359,7 +414,15 @@ BOOL APIENTRY DllMain(HMODULE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
 {
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
+		//
+		PCHAR loc = (PCHAR)
+		//
 		DisableThreadLibraryCalls(hinstDLL);
+
+		this_dll = hinstDLL;
+		
+		LoadLibraryA(chosen_dll); /* if the entry was from LoadLibrary, make sure to actually load the dll that was hijacked */
+		//getprocaddress_hook_setup();
 
 		std::thread T(toybox_main);
 		T.detach();
