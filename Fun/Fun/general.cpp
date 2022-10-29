@@ -231,6 +231,12 @@ void setup_hooks()
 
 		auto jobs_begin = *(std::uintptr_t*)(jobs_singleton + o_jobs_begin);
 		auto jobs_end = *(std::uintptr_t*)(jobs_singleton + o_jobs_end);
+		//printf("singleton(%x), %x, %x\n", jobs_singleton, jobs_begin, jobs_end);
+		if (jobs_begin == NULL || jobs_end == NULL)
+		{
+			printf("boi\n");
+			Sleep(INFINITE);
+		}
 		for (auto job_ptr = jobs_begin; job_ptr != jobs_end; job_ptr += 8)
 		{
 			std::uintptr_t ref_ptr = *(std::uintptr_t*)(job_ptr + 4);
@@ -311,6 +317,7 @@ void setup_hooks()
 
 							printf("signal set, ready for commands.\n");
 						}
+						else printf("it was not runservice\n");
 						if (!strcmp(classname, "ScriptContext"))
 						{
 							printf("found %s\n", classname);
@@ -319,19 +326,23 @@ void setup_hooks()
 
 							printf("LocalScript state: 0x%08X\n", rbx_localscript_globalthread);
 						}
-					}
+						else printf("it was not ScriptContext\n");
+					} 
 				}
+				else printf("no children list\n");
 			}
+			else printf("it was not datamodel\n");
 		}
+		else printf("no datamodel\n");
 	}
 
 	return;
 }
 
-const char* chosen_dll = "Shell32.dll";
+/*const char* chosen_dll = "Shell32.dll";
 std::uintptr_t getprocaddress_address = NULL;
-std::uintptr_t original_data_ptr = NULL; /* .data offset from `jmp ds:[loc]` */
-std::uintptr_t replaced_data_ptr = NULL; /* somewhere in .data that we want to place the hook */
+std::uintptr_t original_data_ptr = NULL; // .data offset from `jmp ds:[loc]` 
+std::uintptr_t replaced_data_ptr = NULL; // somewhere in .data that we want to place the hook 
 
 FARPROC WINAPI getprocaddress_hook(HMODULE hModule, LPCSTR lpProcName)
 {
@@ -339,7 +350,7 @@ FARPROC WINAPI getprocaddress_hook(HMODULE hModule, LPCSTR lpProcName)
 	{
 		*(std::uint32_t*)(getprocaddress_address + 0x2) = original_data_ptr;
 		FARPROC result = GetProcAddress(hModule, lpProcName);
-		*(std::uint32_t*)(getprocaddress_address + 0x2) = replaced_data_ptr; /* this function */
+		*(std::uint32_t*)(getprocaddress_address + 0x2) = replaced_data_ptr; // this function 
 
 		return result;
 	}
@@ -378,7 +389,7 @@ void getprocaddress_hook_setup()
 	Sleep(UINT_MAX);
 
 	return;
-}
+}*/
 
 int toybox_main()
 {
@@ -387,7 +398,7 @@ int toybox_main()
 	setup_hooks();
 	commands_init();
 
-	getprocaddress_hook_setup();
+	//getprocaddress_hook_setup();
 
 	while (true)
 	{
@@ -421,7 +432,7 @@ BOOL APIENTRY DllMain(HMODULE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
 
 		this_dll = hinstDLL;
 		
-		LoadLibraryA(chosen_dll); /* if the entry was from LoadLibrary, make sure to actually load the dll that was hijacked */
+		//LoadLibraryA(chosen_dll); /* if the entry was from LoadLibrary, make sure to actually load the dll that was hijacked */
 		//getprocaddress_hook_setup();
 
 		std::thread T(toybox_main);
