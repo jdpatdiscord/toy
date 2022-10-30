@@ -3,4 +3,4 @@
 	url = https://github.com/jdpatdiscord/ExceptionHandler
 [submodule "Fun/Fun/luau"]
 	path = Fun/Fun/luau
-	url = https://github.com/Roblox/luau
+	url = https://github.com/roblox/luau

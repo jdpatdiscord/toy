@@ -12,32 +12,33 @@ constexpr unsigned cc_cdecl = 1;
 constexpr unsigned cc_fastcall = 2;
 
 /* modified addresses */
-const std::uintptr_t add_signal_function = _Rebase(0x1C9F540); // "AppStarted"/"GuiCluster"
-const std::uintptr_t main_jobs_singleton = _Rebase(0x3739F9C); // "averageStepTime"
+const std::uintptr_t add_signal_function = _Rebase(0x1DA0C90); // "AppStarted"/"GuiCluster"
+const std::uintptr_t main_jobs_singleton = _Rebase(0x3E4EBF0); // "averageStepTime"
 
-const std::uintptr_t call_ebx_occurrence = _Rebase(0x5E9CEF); // FF D3 in IDA
+const std::uintptr_t call_ebx_occurrence = _Rebase(0x6B8E01); // FF D3 in IDA
 
-const std::uintptr_t luau_load = _Rebase(0x1A32710); // (lua_State* L, const char* chunkname, const char* data, size_t size, int env), "Parallel" xref
-const std::uintptr_t rbx_spawn = _Rebase(0x7CA5E0); // __cdecl (lua_State*), "Spawn function requires 1 argument"
-
+const std::uintptr_t luau_load = _Rebase(0x730940); // (lua_State* L, const char* chunkname, const char* data, size_t size, int env), "challenge" 
+const std::uintptr_t rbx_spawn = _Rebase(0x909220); // __cdecl (lua_State*), "Spawn function requires 1 argument" unverified
 // "Unable to create an Instance of type"
-
 const std::uintptr_t namefactory_singleton = _Rebase(0x36B91A4);
 
 const std::uintptr_t namefactory_lock = _Rebase(0x213FFF5);
 const std::uintptr_t namefactory_unlock = _Rebase(0x2140050);
+
+// ? can i get this address its like 2 clicks away buyt sure
+const std::uintptr_t walkspeed_setter = _Rebase(0xDA2580);
 
 /* modified offsets */
 
 const std::ptrdiff_t o_namefactory_nullname = 72;
 const std::ptrdiff_t o_namefactory_namemap = 48;
 
-const std::ptrdiff_t o_waitingscriptjob_scriptcontext = 304;
+const std::ptrdiff_t o_waitingscriptjob_scriptcontext = 308; // need to remembert this too
 
-const std::ptrdiff_t o_jobs_begin = 300;
-const std::ptrdiff_t o_jobs_end = 304;
+const std::ptrdiff_t o_jobs_begin = 308;
+const std::ptrdiff_t o_jobs_end = 312;
 
-const std::ptrdiff_t o_scriptcontext_localscriptstate = 308;
+const std::ptrdiff_t o_scriptcontext_localscriptstate = 308; // need to find these again
 const std::ptrdiff_t o_scriptcontext_corescriptstate = 508;
 
 constexpr unsigned e_scriptcontext_enc = ptr_suboff;
@@ -50,7 +51,7 @@ const std::ptrdiff_t o_ls_extraspace = 112;
 const std::ptrdiff_t o_es_identity = 24;
 
 /* more or less constant values */
-constexpr std::ptrdiff_t o_tt = 12;
+constexpr std::ptrdiff_t o_tt = 12;// can you leave comments for me so i know how to find them lol
 constexpr std::ptrdiff_t c_tvaluesize = 16;
 
 /* base instance */

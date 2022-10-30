@@ -69,6 +69,12 @@
     <ClCompile Include="luau\Ast\src\StringUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="luau\Compiler\src\CostModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="luau\Compiler\src\BuiltinFolding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="addresses.hpp">
@@ -141,6 +147,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="luau\Ast\include\Luau\StringUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="luau\Compiler\src\CostModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="luau\Compiler\src\BuiltinFolding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

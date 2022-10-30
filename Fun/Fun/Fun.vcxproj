@@ -109,7 +109,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)luau\Compiler\include;$(ProjectDir)luau\Ast\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)luau\Common\include;$(ProjectDir)luau\Compiler\include;$(ProjectDir)luau\Ast\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,10 +165,12 @@
     <ClCompile Include="luau\Ast\src\Parser.cpp" />
     <ClCompile Include="luau\Ast\src\StringUtils.cpp" />
     <ClCompile Include="luau\Ast\src\TimeTrace.cpp" />
+    <ClCompile Include="luau\Compiler\src\BuiltinFolding.cpp" />
     <ClCompile Include="luau\Compiler\src\Builtins.cpp" />
     <ClCompile Include="luau\Compiler\src\BytecodeBuilder.cpp" />
     <ClCompile Include="luau\Compiler\src\Compiler.cpp" />
     <ClCompile Include="luau\Compiler\src\ConstantFolding.cpp" />
+    <ClCompile Include="luau\Compiler\src\CostModel.cpp" />
     <ClCompile Include="luau\Compiler\src\lcode.cpp" />
     <ClCompile Include="luau\Compiler\src\TableShape.cpp" />
     <ClCompile Include="luau\Compiler\src\ValueTracking.cpp" />
@@ -194,8 +196,10 @@
     <ClInclude Include="luau\Compiler\include\Luau\Bytecode.h" />
     <ClInclude Include="luau\Compiler\include\Luau\BytecodeBuilder.h" />
     <ClInclude Include="luau\Compiler\include\Luau\Compiler.h" />
+    <ClInclude Include="luau\Compiler\src\BuiltinFolding.h" />
     <ClInclude Include="luau\Compiler\src\Builtins.h" />
     <ClInclude Include="luau\Compiler\src\ConstantFolding.h" />
+    <ClInclude Include="luau\Compiler\src\CostModel.h" />
     <ClInclude Include="luau\Compiler\src\TableShape.h" />
     <ClInclude Include="luau\Compiler\src\ValueTracking.h" />
     <ClInclude Include="runtime.hpp" />

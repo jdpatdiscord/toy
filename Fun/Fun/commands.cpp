@@ -60,7 +60,7 @@ void cmd_set_walkspeed(int, std::vector<std::string>& arg_list)
 						if (humanoid != NULL)
 						{
 							float new_speed = std::stof(arg_list[0]);
-							//((int(__thiscall*)(std::uintptr_t, float))walkspeed_setter)(humanoid, new_speed);
+							((int(__thiscall*)(std::uintptr_t, float))walkspeed_setter)(humanoid, new_speed);
 						}
 					}
 				}
