@@ -219,6 +219,8 @@ int __fastcall teleport_callback(std::uintptr_t _this, std::uintptr_t, std::uint
 	return (*(int(__thiscall*)(std::uintptr_t, std::uintptr_t))waiting_script_job_destroy)(_this, a1);
 }
 
+bool scriptcontext_step = false;
+bool runservice_step = false;
 void setup_hooks()
 {
 	while (!main_script_context)
@@ -231,12 +233,7 @@ void setup_hooks()
 
 		auto jobs_begin = *(std::uintptr_t*)(jobs_singleton + o_jobs_begin);
 		auto jobs_end = *(std::uintptr_t*)(jobs_singleton + o_jobs_end);
-		//printf("singleton(%x), %x, %x\n", jobs_singleton, jobs_begin, jobs_end);
-		if (jobs_begin == NULL || jobs_end == NULL)
-		{
-			printf("boi\n");
-			Sleep(INFINITE);
-		}
+
 		for (auto job_ptr = jobs_begin; job_ptr != jobs_end; job_ptr += 8)
 		{
 			std::uintptr_t ref_ptr = *(std::uintptr_t*)(job_ptr + 4);
@@ -276,7 +273,6 @@ void setup_hooks()
 		}
 
 		main_script_context = *(std::uintptr_t*)((std::uintptr_t)waiting_script_job + o_waitingscriptjob_scriptcontext);
-
 		data_model = *(std::uintptr_t*)(main_script_context + o_parent);
 		if (data_model)
 		{
@@ -316,8 +312,11 @@ void setup_hooks()
 							((int(__thiscall*)(std::uintptr_t, std::uint32_t*))add_signal_function)(instance + o_runservice_stepped, signal_data);
 
 							printf("signal set, ready for commands.\n");
+
+							runservice_step = true;
+							if (runservice_step && scriptcontext_step) return;
 						}
-						else printf("it was not runservice\n");
+
 						if (!strcmp(classname, "ScriptContext"))
 						{
 							printf("found %s\n", classname);
@@ -325,15 +324,14 @@ void setup_hooks()
 							rbx_localscript_globalthread = RL::decrypt_pointer(instance + o_scriptcontext_localscriptstate, e_scriptcontext_enc);
 
 							printf("LocalScript state: 0x%08X\n", rbx_localscript_globalthread);
+
+							scriptcontext_step = true;
+							if (runservice_step && scriptcontext_step) return;
 						}
-						else printf("it was not ScriptContext\n");
 					} 
 				}
-				else printf("no children list\n");
 			}
-			else printf("it was not datamodel\n");
 		}
-		else printf("no datamodel\n");
 	}
 
 	return;

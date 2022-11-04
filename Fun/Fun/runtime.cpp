@@ -20,14 +20,12 @@ __declspec(naked) void __fastcall fastcall_empty_function()
 
 char* instance_classname(std::uintptr_t instance)
 {
-	auto p_classname_f = *(std::uintptr_t*)instance + o_classname;
-
-	auto string_class = (*(std::uintptr_t(**)(void))p_classname_f)();
-	if (*(std::uintptr_t*)(string_class + o_classnamelength) >= 16)
+	auto p_string_class = *(std::uintptr_t**)(instance + o_classname) + 1;
+	if (*(std::uintptr_t*)(*p_string_class + o_classnamelength) >= 16)
 	{
-		return *(char**)string_class;
+		return *(char**)*p_string_class;
 	}
-	return (char*)string_class;
+	return (char*)*p_string_class;
 }
 
 std::string& instance_name(std::uintptr_t instance)
@@ -112,72 +110,6 @@ std::uintptr_t find_first_descendant_of_class(std::uintptr_t instance, const cha
 		}
 	}
 	return o;
-}
-
-std::uint32_t RBX::Name::_impl_namehash(char* begin, char* end)
-{
-	unsigned int result;
-	int v4;
-
-	char* v2 = begin;
-	for (result = 0; v2 != end; result ^= (result >> 2) + (result << 6) + v4)
-		v4 = *v2++ - 0x61C88647;
-	return result;
-}
-
-std::uintptr_t RBX::Name::_impl_find(std::uintptr_t map_0, const char** pkey)
-{
-	std::uintptr_t map1_4 = *(std::uintptr_t*)(map_0 + 4);
-	std::uintptr_t map1_0 = *(std::uintptr_t*)(map_0 + 0);
-	std::uintptr_t map2_0 = *(std::uintptr_t*)(map_0 + 0);
-	std::uintptr_t map0_16 = *(std::uintptr_t*)(map_0 + 16);
-	std::uintptr_t key_0 = (std::uintptr_t)(*pkey);
-	std::uintptr_t key_1 = (std::uintptr_t)(*pkey);
-
-	if (!strcmp((char*)key_0, (char*)map0_16)) return NULL;
-
-	int keya = 0;
-
-	std::uint32_t name_hash = _impl_namehash((char*)key_0, (char*)(key_0 + strlen((char*)key_0)));
-	std::uint32_t hash_mask = ((map1_4 - map1_0) >> 3) - 1;
-	std::uint32_t hash_total = hash_mask & name_hash;
-
-	int sresult;
-
-	while (1)
-	{
-		std::uintptr_t ppDescriptor = (std::uintptr_t)(map2_0 + 8 * hash_total);
-		sresult = strcmp(*(const char**)(ppDescriptor + 0), (char*)key_1);
-		if (sresult == 0)
-		{
-			return (std::uintptr_t)ppDescriptor + 4;
-		}
-		//sresult = strcmp(*(const char**)(ppDescriptor + 0), (char*)map0_16);
-		//if (sresult)
-		{
-			hash_total = hash_mask & (keya + hash_total + 1);
-			if (++keya <= hash_mask) continue;
-		}
-		return NULL;
-	}
-}
-
-std::uintptr_t RBX::Name::Lookup(const char* classname, const char* output_file)
-{
-	std::uintptr_t namefactory = *(std::uintptr_t*)namefactory_singleton;
-
-	int mutex_status = ((int(__cdecl*)(std::uintptr_t))namefactory_lock)(namefactory);
-	if (mutex_status != 0) return 0;
-
-	std::uintptr_t result = _impl_find(namefactory + o_namefactory_namemap, &classname);
-	if (result)
-		result = *(std::uintptr_t*)result;
-	else
-		result = namefactory + o_namefactory_nullname;
-
-	((int(__cdecl*)(std::uintptr_t))namefactory_unlock)(namefactory);
-
-	return result;
 }
 
 std::uintptr_t RL::decrypt_pointer(std::uintptr_t address, int type)

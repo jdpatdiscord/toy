@@ -67,14 +67,4 @@ namespace RL
 	std::uintptr_t gettop(std::uintptr_t thread);
 	void setthreadidentity(std::uintptr_t thread, std::uint64_t identity);
 	std::uintptr_t index2adr(std::uintptr_t thread, int index);
-}
-
-namespace RBX
-{
-	namespace Name
-	{
-		std::uint32_t _impl_namehash(char* begin, char* end);
-		std::uintptr_t _impl_find(std::uintptr_t map_0, const char** pkey);
-		std::uintptr_t Lookup(const char* classname, const char* output_file);
-	}
-}
+};

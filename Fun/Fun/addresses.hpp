@@ -13,14 +13,16 @@ constexpr unsigned cc_fastcall = 2;
 
 /* modified addresses */
 const std::uintptr_t add_signal_function = _Rebase(0x1DA6980); // "AppStarted"/"GuiCluster"
-const std::uintptr_t main_jobs_singleton = _Rebase(0x3E6335C); // "GetJobsInfo" -> "averageStepsPerSecond", "averageStepTime", ...
+const std::uintptr_t main_jobs_singleton = _Rebase(0x3E47574); // "GetJobsInfo" -> "averageStepsPerSecond", "averageStepTime", ...
 
-const std::uintptr_t call_ebx_occurrence = _Rebase(0x6BBCEE); // FF D3 in IDA
+const std::uintptr_t call_ebx_occurrence = _Rebase(0x7035D3); // Search -> Sequence of bytes FF D3 in IDA
 
-const std::uintptr_t luau_load = _Rebase(0x730940); // (lua_State* L, const char* chunkname, const char* data, size_t size, int env), "challenge" 
-const std::uintptr_t rbx_spawn = _Rebase(0x90E3C0); // __cdecl (lua_State*), "Spawn function requires 1 argument" unverified
+const std::uintptr_t luau_load = _Rebase(0x734E00); // (lua_State* L, const char* chunkname, const char* data, size_t size, int env), "challenge", "oldResult, moduleRef"... 
+const std::uintptr_t rbx_spawn = _Rebase(0x7F8A04); // __cdecl (lua_State*), "Spawn function requires 1 argument" unverified
 
-const std::uintptr_t walkspeed_setter = _Rebase(0xDAE3D0);
+const std::uintptr_t walkspeed_setter = _Rebase(0xA29660);
+
+// task.delay "delay function requires 2 arguments"
 
 //
 
@@ -41,10 +43,10 @@ const std::ptrdiff_t o_waitingscriptjob_scriptcontext = 304; // need to remember
 const std::ptrdiff_t o_jobs_begin = 308;
 const std::ptrdiff_t o_jobs_end = 312;
 
-const std::ptrdiff_t o_scriptcontext_localscriptstate = 476; // "startScript re-entrancy has exceeded 3", "Running Script \"%s\"", "%s %s detected as malicious.  %s will not run."
+const std::ptrdiff_t o_scriptcontext_localscriptstate = 476; // fflag next to "Script Start" -> others "startScript re-entrancy has exceeded 3", "Running Script \"%s\"", "%s %s detected as malicious.  %s will not run."
 const std::ptrdiff_t o_scriptcontext_corescriptstate = 300;
 
-constexpr unsigned e_scriptcontext_enc = ptr_suboff;
+constexpr unsigned e_scriptcontext_enc = ptr_addptr;
 
 const std::ptrdiff_t o_ls_top = 20;
 const std::ptrdiff_t o_ls_base = 24;
@@ -59,10 +61,10 @@ constexpr std::ptrdiff_t c_tvaluesize = 16;
 
 /* base instance */
 const std::ptrdiff_t o_children = 40;
-const std::ptrdiff_t o_parent = 48;
-const std::ptrdiff_t o_name = 36; //"Skinning will not be supported for Meshpart directly placed under WorkSpace in the future. MeshPart name is %s"
-const std::ptrdiff_t o_classname = 16;
-const std::ptrdiff_t o_classnamelength = 20;
+const std::ptrdiff_t o_parent = 48; //"Part does not have the same parent as Humanoid"
+const std::ptrdiff_t o_name = 36; //"Character cannot be changed as Player (%s) is being removed."
+const std::ptrdiff_t o_classname = 12;
+const std::ptrdiff_t o_classnamelength = 16;
 
 /* players */
 const std::ptrdiff_t o_localplayer = 344; // "LocalPlayer"/"No local Player to chat from"
@@ -71,7 +73,7 @@ const std::ptrdiff_t o_localplayer = 344; // "LocalPlayer"/"No local Player to c
 const std::ptrdiff_t o_character = 124; // "Character"
 
 /* runservice */
-const std::ptrdiff_t o_runservice_stepped = 244; // "RunService.Stepped"
+const std::ptrdiff_t o_runservice_stepped = 308; // "Stepped", ""RenderStepped event can only be used from local scripts"
 
 /* humanoid */
 // ...
