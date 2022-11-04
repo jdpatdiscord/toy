@@ -18,7 +18,7 @@ const std::uintptr_t main_jobs_singleton = _Rebase(0x3E47574); // "GetJobsInfo" 
 const std::uintptr_t call_ebx_occurrence = _Rebase(0x7035D3); // Search -> Sequence of bytes FF D3 in IDA
 
 const std::uintptr_t luau_load = _Rebase(0x734E00); // (lua_State* L, const char* chunkname, const char* data, size_t size, int env), "challenge", "oldResult, moduleRef"... 
-const std::uintptr_t rbx_spawn = _Rebase(0x7F8A04); // __cdecl (lua_State*), "Spawn function requires 1 argument" unverified
+const std::uintptr_t rbx_spawn = _Rebase(0x7F8A10); // __cdecl (lua_State*), "Spawn function requires 1 argument" unverified
 
 const std::uintptr_t walkspeed_setter = _Rebase(0xA29660);
 
@@ -60,7 +60,7 @@ constexpr std::ptrdiff_t o_tt = 12;
 constexpr std::ptrdiff_t c_tvaluesize = 16;
 
 /* base instance */
-const std::ptrdiff_t o_children = 40;
+const std::ptrdiff_t o_children = 40; //"ClearAllChildren"
 const std::ptrdiff_t o_parent = 48; //"Part does not have the same parent as Humanoid"
 const std::ptrdiff_t o_name = 36; //"Character cannot be changed as Player (%s) is being removed."
 const std::ptrdiff_t o_classname = 12;
